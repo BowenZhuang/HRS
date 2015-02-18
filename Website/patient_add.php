@@ -17,7 +17,7 @@ if (!mysql_query($sql,$con))
   }
 echo "1 record added";
 echo "<hr>";
-echo "<strong><a href='add.htm'>Back to Add Page</a></strong>";
+echo "<strong><a href='add.html'>Back to Add Page</a></strong>";
 
 mysql_close($con);
 ?>
