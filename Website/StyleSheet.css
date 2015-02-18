@@ -1,22 +1,32 @@
+html{
+  height: 100%;
+}
 
 body{
- font-family:arial,helvetica,sans-serif;
- color:#888;
- background-color:white;
- font-size:small;
-  margin-top:100px; 
-  background-image:url('res/Green-Leaves.jpg');
-background-repeat:no-repeat;
+	min-height: 100%;
+	font-family:arial,helvetica,sans-serif;
+	color:#888;
+	background-color:white;
+	font-size:small;
+	margin-top:100px; 
+	background-image:url('res/Green-Leaves.jpg');
+	background-repeat:no-repeat;
     background-position:left top; 
+	
  
 }
 
 .block-wrapper{
- width:300px;
+ width:350px;
  margin-top:200px;
  margin-bottom:auto;
  margin-left:auto;
  margin-right:auto;
+background-color:#ffffff;
+border: 2px solid #ededed;
+border-radius: 10px;
+padding: 10px 10px 10px 10px;
+
 }
 
 footer{
@@ -40,7 +50,16 @@ footer{
  text-align:center;
 
 }
+.centerButton{
 
+ margin-left:40%;
+ margin-right:auto;
+}
+a {
+color : #366;
+text-decoration: none;
+}
 a:visited{
  color:#7E84A1;
+ text-decoration: none;
 }

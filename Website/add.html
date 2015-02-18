@@ -6,54 +6,92 @@
 
 <head>
     <title>Hospital Reservation System</title>
+	<script type="text/javascript">
+	
+	
+		function validateFields(){
+		
+			var name;
+			var dob;
+			var phone;
+			var numOfField;
+			
+			name = document.getElementById("name").value;
+			dob = document.getElementById("dob").value;
+			phone = document.getElementById("phone").value;
+			numOfField = 0;
+			
+			if ( name != "") {
+				numOfField++;
+			
+			} else {
+				document.getElementById("nameFeedback").innerHTML = "Required field";
+			}
+			
+			if ( dob != "") {
+				numOfField++;
+			
+			} else {
+				document.getElementById("dobFeedback").innerHTML = "Required field";
+			}
+
+			if ( phone != "") {
+				numOfField++;
+			
+			} else {
+				document.getElementById("phoneFeedback").innerHTML = "Required field";
+			}			
+			
+			if (numOfField == 3){
+			
+				document.form_add.submit();
+			}
+			
+		}
+		
+		</script>
 </head>
 <body>
-	
-    <form id="form1" action="patient_add.php" method="POST" class="block-wrapper">
 
-        <br />
-        <table >
-			<tr>
-				<td colspan="2">
-				<h2> Hospital Reservtion System </h2>
-				</td>
-			</tr>
-		
+	<div class="menu"> <a href="delete.html">Delete Reservation </a> </div>
+	
+	
+    <form  class="block-wrapper" id="form_add" action="patient_add.php" method="post">
+	
+		<h2 align="center"> Hospital Reservtion System </h2>
+        <table>
             <tr>
                 <td>Name</td>
                 <td>
 
-        <input type="text" name="name" ID="name" >
+					<input type="text" name="name" ID="name" >
     
                 </td>
+				<td id="nameFeedback">  </td>
             </tr>
             <tr>
                 <td>Date of Birth</td>
                 <td>
                     <input type="text" name="dob" ID="dob" >
                 </td>
+				<td id="dobFeedback">  </td>
+				
             </tr>
             <tr>
                 <td>Phone</td>
                 <td>
                     <input type="text" name="phone" ID="phone" >
                 </td>
-            </tr>
-			
-			  <tr>
-                <td colspan="2">
-
-                    <input type="submit">
-
-                </td>
+				<td id="phoneFeedback">  </td>
             </tr>
 			
 			
         </table>
-    
-    </div>
+		<br/>
+		
+		<input class="centerButton" type="button" value="Submit" onclick="validateFields()">	
 	
     </form>
-    <footer> by Kungfu Panda 2015 </footer>
+	<footer> by Kungfu Panda 2015 </footer>
 </body>
 </html>
