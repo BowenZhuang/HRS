@@ -1,17 +1,16 @@
-html{
-  height: 100%;
+html {
+    height: 100%;
 }
 
 body{
-	min-height: 100%;
+	height: 100%;
 	font-family:arial,helvetica,sans-serif;
 	color:#888;
 	background-color:white;
 	font-size:small;
-	margin-top:100px; 
 	background-image:url('res/Green-Leaves.jpg');
 	background-repeat:no-repeat;
-    background-position:left top; 
+    background-position:left bottom; 
 	
  
 }
