@@ -9,7 +9,7 @@ mysql_query("Use pInfo", $con);
 
 $sql="INSERT INTO pLog (pname, dob, phone, bCalled, bSentSMS)
 VALUES
-('$_POST[name]','$_POST[dob]','$_POST[phone]','false', 'false')";
+('$_POST[name]','$_POST[dob]','$_POST[phone]',0,0)";
 
 if (!mysql_query($sql,$con))
   {
