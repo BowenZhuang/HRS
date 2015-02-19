@@ -1,11 +1,18 @@
 package com.zhuang.bowen.hospitalreservation;
 
+import android.app.Activity;
+import android.app.ListActivity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -24,21 +31,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import android.support.v4.widget.SwipeRefreshLayout;
 
-public class PatientListActivity extends ActionBarActivity {
+public class PatientListActivity extends ListActivity {
     private HttpClient httpclient = new DefaultHttpClient();
     private HttpResponse response = null;
     private StatusLine statusLine = null;
-    private String URL = "http://10.113.21.167/4x4/patient_getJson.php";
+    private String URL = "http://10.113.21.141/4x4/patient_getJson.php";
     String responseString = "";
+    private JSONArray patientList;
+    private List<Patient> patients = new ArrayList<Patient>();
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ListView mListView;
+
+    public PatientListActivity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_patient_list);
+
+
+        //setContentView(R.layout.activity_patient_list);
         httpclient = new DefaultHttpClient();
+        // Retrieve the SwipeRefreshLayout and ListView instances
+
         //init();
 
-            new TheTask().execute(URL);
+        TheTask task =   new TheTask();
+        task.context = this;
+        task.execute(URL);
 
 
     }
@@ -48,7 +72,7 @@ public class PatientListActivity extends ActionBarActivity {
     {
 
         private TableLayout stk;
-
+        private Activity context;
         @Override
         protected void onPostExecute(String result) {
             // TODO Auto-generated method stub
@@ -58,6 +82,8 @@ public class PatientListActivity extends ActionBarActivity {
             responseString = result;
             if(!responseString.equals("No string.")&& !responseString.equals("Network problem")){
                 init();
+                ListAdapter adapter = new PatientListAdpter(context, patients);
+                setListAdapter( adapter);
             }
 
         }
@@ -91,76 +117,45 @@ public class PatientListActivity extends ActionBarActivity {
 
     }
 
-    private JSONArray patientList;
+
     public void init( ) {
         try {
             patientList = new JSONArray(responseString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        TableLayout stk = (TableLayout) findViewById(R.id.table_main);
-        TableRow tbrow0 = new TableRow(this);
-        TextView tv0 = new TextView(this);
-        tv0.setText("Patient No ");
-        tv0.setTextColor(Color.BLACK);
-        tbrow0.addView(tv0);
-        TextView tv1 = new TextView(this);
-        tv1.setText(" Name ");
-        tv1.setTextColor(Color.BLACK);
-        tbrow0.addView(tv1);
-        TextView tv2 = new TextView(this);
-        tv2.setText("Date of Birth ");
-        tv2.setTextColor(Color.BLACK);
-        tbrow0.addView(tv2);
-        TextView tv3 = new TextView(this);
-        tv3.setText("Phone Number");
-        tv3.setTextColor(Color.BLACK);
-        tbrow0.addView(tv3);
-        /*TextView tv4 = new TextView(this);
-        tv3.setText(" Is Called ");
-        tv3.setTextColor(Color.BLACK);
-        tbrow0.addView(tv4);*/
-        stk.addView(tbrow0);
-        String name ="";
-        String phone="";
-        String birthday="";
-        String number = "";
-        String isCalled ="";
-        String isTexted = "";
+
         if(patientList!=null){
+            String name;
+            String number;
+            String phone;
+            String isCalled;
+            String isTexted;
+            String birthday;
+
             for (int i = 0; i < patientList.length(); i++) {
                 JSONObject jsonobject = null;
                 try {
                     //{"id":"1","pname":"becky liu","dob":"1989-12-25","phone":"1-233-123-1234","bCalled":"0","bSentSMS":"0"}
                     jsonobject = patientList.getJSONObject(i);
+
                     name = jsonobject.getString("pname");
                     number = jsonobject.getString("id");
                     phone = jsonobject.getString("phone");
                     isCalled = jsonobject.getString("bCalled");
                     isTexted = jsonobject.getString("bSentSMS");
+                    birthday = jsonobject.getString("dob");
+                    boolean bcalled = false;
+                    boolean bTexted = false;
+                    if(isCalled.equals("1")){
+                        bcalled =true;
+                    }
+                    if(isTexted.equals("1")){
+                        bTexted = true;
+                    }
+                    Patient patient =new Patient(name,number,phone,birthday,bcalled,bTexted);
+                    patients.add(patient);
 
-                    TableRow tbrow = new TableRow(this);
-                    TextView t1v = new TextView(this);
-                    t1v.setText(number);
-                    t1v.setTextColor(Color.BLACK);
-                    t1v.setGravity(Gravity.CENTER);
-                    tbrow.addView(t1v);
-                    TextView t2v = new TextView(this);
-                    t1v.setText(name);
-                    t1v.setTextColor(Color.BLACK);
-                    t1v.setGravity(Gravity.CENTER);
-                    tbrow.addView(t2v);
-                    TextView t3v = new TextView(this);
-                    t1v.setText(birthday);
-                    t1v.setTextColor(Color.BLACK);
-                    t1v.setGravity(Gravity.CENTER);
-                    tbrow.addView(t3v);
-                    TextView t4v = new TextView(this);
-                    t1v.setText(phone);
-                    t1v.setTextColor(Color.BLACK);
-                    t1v.setGravity(Gravity.CENTER);
-                    tbrow.addView(t4v);
-                    stk.addView(tbrow);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
