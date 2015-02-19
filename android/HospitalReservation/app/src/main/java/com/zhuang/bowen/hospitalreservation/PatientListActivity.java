@@ -1,20 +1,19 @@
 package com.zhuang.bowen.hospitalreservation;
-
-import android.app.Activity;
-import android.app.ListActivity;
+import android.widget.Toast;
+import android.telephony.SmsManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.app.Activity;
+import android.app.ListActivity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -41,21 +40,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.widget.Toast;
 
-public class PatientListActivity extends ListActivity {
-    private HttpClient httpclient = null;
+public class PatientListActivity extends ListActivity implements SwipeRefreshLayout.OnRefreshListener{
+    private HttpClient httpclient = new DefaultHttpClient();
     private HttpResponse response = null;
     private StatusLine statusLine = null;
-    private String Server = "10.113.21.141";
+    public static String Server = "10.113.21.141";
     private String URL = "http://" + Server + "/4x4/patient_getjson.php";
     String responseString = "";
     private JSONArray patientList;
     private List<Patient> patients = new ArrayList<Patient>();
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private SwipeRefreshLayout swipeLayout;
     private ListView mListView;
     private String SMSMessage = "You can see a doctor within 20 minutes.[From Kungfu Panda]";
-
     public PatientListActivity() {
     }
 
@@ -63,12 +60,30 @@ public class PatientListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_list);
-
-
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setColorSchemeColors(android.R.color.holo_blue_dark,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         httpclient = new DefaultHttpClient();
+        // Retrieve the SwipeRefreshLayout and ListView instances
+
+        //init();
+
         TheTask task =   new TheTask();
         task.context = this;
         task.execute(URL);
+
+
+    }
+
+    @Override
+    public void onRefresh() {
+        TheTask task =   new TheTask();
+        task.context = this;
+        task.execute(URL);
+
     }
 
 
@@ -88,6 +103,7 @@ public class PatientListActivity extends ListActivity {
                 init();
                 ListAdapter adapter = new PatientListAdpter(context, patients);
                 setListAdapter( adapter);
+                swipeLayout.setRefreshing(false);
             }
 
         }
@@ -120,54 +136,15 @@ public class PatientListActivity extends ListActivity {
         }
 
     }
-    class TheUpdateCallTask extends AsyncTask<String,String,String>
-    {
-        @Override
-        protected void onPostExecute(String result) {
-            // TODO Auto-generated method stub
-            super.onPostExecute(result);
-            Toast.makeText(getBaseContext(), result,
-                    Toast.LENGTH_SHORT).show();
-        }
 
-        @Override
-        protected void onPreExecute() {
-            // TODO Auto-generated method stub
-            super.onPreExecute();
-        }
 
-        @Override
-        protected String doInBackground(String... params) {
-            try
-            {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost method = new HttpPost(params[0]);
-                HttpResponse response = httpclient.execute(method);
-                HttpEntity entity = response.getEntity();
-                if(entity != null){
-                    return EntityUtils.toString(entity);
-                }
-                else{
-                    return "No string.";
-                }
-            }
-            catch(Exception e){
-                return "Network problem";
-            }
-        }
-    }
-
-    private void updateCall(Patient curPatient) {
-        String urlClick = "http://" + Server + "/4x4/patient_update.php?id=";
-        urlClick += curPatient.getId() + "&called=1";
-        new TheUpdateCallTask().execute(urlClick);
-    }
     private void updateSMS(Patient curPatient){
-        String urlClick = "http://" + Server + "/4x4/patient_updatesms.php?id=";
-        urlClick += curPatient.getId() + "&sms=1";
-        new TheUpdateCallTask().execute(urlClick);
-        // phonenumber -> the content(sms message)
-        sendSMS(curPatient.getPhone(), SMSMessage);
+            String urlClick = "http://" + Server + "/4x4/patient_updatesms.php?id=";
+            urlClick += curPatient.getId() + "&sms=1";
+            new TheUpdateCallTask().execute(urlClick);
+            // phonenumber -> the content(sms message)
+            sendSMS(curPatient.getPhone(), SMSMessage);
+            curPatient.setMsgSent(true);
     }
 
     //---sends an SMS message to another device---
@@ -232,6 +209,7 @@ public class PatientListActivity extends ListActivity {
         sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
     }
 
+
     public void init( ) {
         try {
             patientList = new JSONArray(responseString);
@@ -246,7 +224,7 @@ public class PatientListActivity extends ListActivity {
             String isCalled;
             String isTexted;
             String birthday;
-
+            patients.clear();
             for (int i = 0; i < patientList.length(); i++) {
                 JSONObject jsonobject = null;
                 try {
@@ -264,15 +242,15 @@ public class PatientListActivity extends ListActivity {
                     if(isCalled.equals("1")){
                         bcalled =true;
                     }
-                    if(isTexted.equals("1")){
-                        bTexted = true;
-                    }
-                    Patient patient =new Patient(name,number,phone,birthday,bcalled,bTexted);
-                    patients.add(patient);
 
+                    Patient patient =new Patient(name,number,phone,birthday,bcalled,bTexted);
                     if(bTexted == false){
                         updateSMS(patient);
                     }
+                    if(isTexted.equals("1")){
+                        bTexted = true;
+                    }
+                    patients.add(patient);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
