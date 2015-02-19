@@ -60,6 +60,8 @@ public class PatientListAdpter extends ArrayAdapter<Patient> {
                                     .getTag();
                             CheckBox checkBox = (CheckBox) view;
                             final boolean isChecked = checkBox.isChecked();
+                            updateCall(patient);
+
 
                         }
                     });
@@ -88,6 +90,12 @@ public class PatientListAdpter extends ArrayAdapter<Patient> {
         holder.isCalled.setChecked(patient.isCalled());
 
         return rowView;
+    }
+
+    private void updateCall(Patient curPatient) {
+        String urlClick = "http://" + PatientListActivity.Server + "/4x4/patient_update.php?id=";
+        urlClick += curPatient.getId() + "&called=1";
+        new TheUpdateCallTask().execute(urlClick);
     }
 }
 
