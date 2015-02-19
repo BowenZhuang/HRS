@@ -10,7 +10,7 @@ if (!$con)
 
 mysql_query("Use pInfo", $con);
 
-$result = mysql_query("SELECT * FROM pLog where bCalled=0"); //where bCalled=0
+$result = mysql_query("SELECT * FROM pLog where bCalled=0 LIMIT 20"); 
 $loop=0;
 $outp = "[";
 while($row = mysql_fetch_array($result)) {
