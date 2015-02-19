@@ -54,6 +54,7 @@ public class PatientListActivity extends ListActivity {
     private List<Patient> patients = new ArrayList<Patient>();
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView mListView;
+    private String SMSMessage = "You can see a doctor within 20 minutes.[From Kungfu Panda]";
 
     public PatientListActivity() {
     }
@@ -156,15 +157,17 @@ public class PatientListActivity extends ListActivity {
         }
     }
 
-    private void updateCall(int nId) {
+    private void updateCall(Patient curPatient) {
         String urlClick = "http://" + Server + "/4x4/patient_update.php?id=";
-        urlClick += Integer.toString(nId) + "&called=1";
+        urlClick += curPatient.getId() + "&called=1";
         new TheUpdateCallTask().execute(urlClick);
     }
-    private void updateSMS(int nId){
+    private void updateSMS(Patient curPatient){
         String urlClick = "http://" + Server + "/4x4/patient_updatesms.php?id=";
-        urlClick += Integer.toString(nId) + "&sms=1";
+        urlClick += curPatient.getId() + "&sms=1";
         new TheUpdateCallTask().execute(urlClick);
+        // phonenumber -> the content(sms message)
+        sendSMS(curPatient.getPhone(), SMSMessage);
     }
 
     //---sends an SMS message to another device---
@@ -266,6 +269,10 @@ public class PatientListActivity extends ListActivity {
                     }
                     Patient patient =new Patient(name,number,phone,birthday,bcalled,bTexted);
                     patients.add(patient);
+
+                    if(bTexted == false){
+                        updateSMS(patient);
+                    }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
