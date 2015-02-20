@@ -45,7 +45,7 @@ public class PatientListActivity extends ListActivity implements SwipeRefreshLay
     private HttpClient httpclient = new DefaultHttpClient();
     private HttpResponse response = null;
     private StatusLine statusLine = null;
-    public static String Server = "10.113.21.141";
+    public static String Server = "192.168.0.116";
     private String URL = "http://" + Server + "/4x4/patient_getjson.php";
     String responseString = "";
     private JSONArray patientList;
@@ -70,20 +70,19 @@ public class PatientListActivity extends ListActivity implements SwipeRefreshLay
         // Retrieve the SwipeRefreshLayout and ListView instances
 
         //init();
+        refreshList();
+    }
 
+    private void refreshList(){
         TheTask task =   new TheTask();
         task.context = this;
         task.execute(URL);
-
-
     }
+
 
     @Override
     public void onRefresh() {
-        TheTask task =   new TheTask();
-        task.context = this;
-        task.execute(URL);
-
+        refreshList();
     }
 
 
@@ -240,22 +239,23 @@ public class PatientListActivity extends ListActivity implements SwipeRefreshLay
                     boolean bcalled = false;
                     boolean bTexted = false;
                     if(isCalled.equals("1")){
-                        bcalled =true;
+                        bcalled = true;
+                    }
+                    if(isTexted.equals("1")){
+                        bTexted = true;
                     }
 
                     Patient patient =new Patient(name,number,phone,birthday,bcalled,bTexted);
                     if(bTexted == false){
                         updateSMS(patient);
-                    }
-                    if(isTexted.equals("1")){
                         bTexted = true;
+                        patient.setMsgSent(true);
                     }
                     patients.add(patient);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
@@ -278,7 +278,6 @@ public class PatientListActivity extends ListActivity implements SwipeRefreshLay
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

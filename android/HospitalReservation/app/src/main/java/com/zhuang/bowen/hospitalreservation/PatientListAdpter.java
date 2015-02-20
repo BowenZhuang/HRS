@@ -61,8 +61,6 @@ public class PatientListAdpter extends ArrayAdapter<Patient> {
                             CheckBox checkBox = (CheckBox) view;
                             final boolean isChecked = checkBox.isChecked();
                             updateCall(patient);
-
-
                         }
                     });
             viewHolder.isCalled.setTag(patients.get(position));
@@ -82,9 +80,9 @@ public class PatientListAdpter extends ArrayAdapter<Patient> {
         holder.phoneText.setText(patient.getPhone());
 
         if (patient.isMsgSent()) {
-            holder.isMsgSent.setText("Yes");
+            holder.isMsgSent.setText("SMS have been sent");
         } else {
-            holder.isMsgSent.setText("No");
+            holder.isMsgSent.setText("");
         }
 
         holder.isCalled.setChecked(patient.isCalled());
