@@ -10,11 +10,11 @@ if (!$con)
 
 mysql_query("Use pInfo", $con);
 
-$result = mysql_query("SELECT * FROM pLog where bCalled=0 LIMIT 20"); 
+$result = mysql_query("SELECT * FROM pLog where bCalled=0 LIMIT 3"); 
 $loop=0;
-$outp = "[";
+$outp = '[';
 while($row = mysql_fetch_array($result)) {
-    if ($outp != "[") {$outp .= ",";}
+    if ($loop > 0) {$outp .= ",";}
     $outp .= '{"id":"'      . $row["id"]      . '",';
     $outp .= '"pname":"'    . $row["pname"]   . '",';
     $outp .= '"dob":"'      . $row["dob"]     . '",';
